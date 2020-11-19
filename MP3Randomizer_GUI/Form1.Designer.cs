@@ -71,9 +71,9 @@
             this.lbl_appTitle.ForeColor = System.Drawing.Color.Silver;
             this.lbl_appTitle.Location = new System.Drawing.Point(12, 9);
             this.lbl_appTitle.Name = "lbl_appTitle";
-            this.lbl_appTitle.Size = new System.Drawing.Size(310, 29);
+            this.lbl_appTitle.Size = new System.Drawing.Size(330, 29);
             this.lbl_appTitle.TabIndex = 0;
-            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0";
+            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.1";
             // 
             // tableLayoutPanel1
             // 
@@ -144,7 +144,7 @@
             this.txtBox_inputISO.Name = "txtBox_inputISO";
             this.txtBox_inputISO.Size = new System.Drawing.Size(719, 20);
             this.txtBox_inputISO.TabIndex = 2;
-            this.txtBox_inputISO.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtBox_inputISO_keyPress);
+            this.txtBox_inputISO.TextChanged += new System.EventHandler(this.txtBox_inputISO_TextChanged);
             // 
             // txtBox_outputPath
             // 
@@ -158,7 +158,7 @@
             this.txtBox_outputPath.Name = "txtBox_outputPath";
             this.txtBox_outputPath.Size = new System.Drawing.Size(719, 20);
             this.txtBox_outputPath.TabIndex = 3;
-            this.txtBox_outputPath.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtBox_outputPath_keyPress);
+            this.txtBox_outputPath.TextChanged += new System.EventHandler(this.txtBox_outputPath_TextChanged);
             // 
             // btn_outputISO
             // 

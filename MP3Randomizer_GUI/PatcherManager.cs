@@ -10,9 +10,7 @@ namespace MP3Randomizer_GUI
         private const string MP3RANDOMIZER_PATH = @".\MP3Randomizer.exe";
         public static bool Patch(Dictionary<String, String> settings)
         {
-            var args = default(String);
-            var info = default(ProcessStartInfo);
-            var proc = default(Process);
+            var args = String.Empty;
             try
             {
                 foreach(KeyValuePair<String, String> setting in settings)
@@ -27,17 +25,35 @@ namespace MP3Randomizer_GUI
                             args += "--" + setting.Key + " \"" + setting.Value+"\"";
                     }
                 }
-                info = new ProcessStartInfo(MP3RANDOMIZER_PATH);
-                info.WorkingDirectory = Directory.GetCurrentDirectory();
-                info.Arguments = args;
-                info.CreateNoWindow = true;
-                info.UseShellExecute = false;
-                proc = Process.Start(info);
-                proc.WaitForExit();
-                return proc.ExitCode == 0;
+
+                LogManager.Log("MP3Randomizer.log", "Command line : " + MP3RANDOMIZER_PATH + " " + args);
+
+                using (var proc = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = MP3RANDOMIZER_PATH,
+                        Arguments = args,
+                        WorkingDirectory = Directory.GetCurrentDirectory(),
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                    }
+                })
+                {
+                    proc.OutputDataReceived += (sender, _args) => LogManager.Log("MP3Randomizer.log", _args.Data);
+                    proc.ErrorDataReceived += (sender, _args) => LogManager.Log("MP3Randomizer_err.log", _args.Data);
+                    proc.Start();
+                    proc.BeginOutputReadLine();
+                    proc.BeginErrorReadLine();
+                    proc.WaitForExit();
+                    return proc.ExitCode == 0;
+                }
             }
-            catch
+            catch (Exception ex)
             {
+                LogManager.Log("MP3Randomizer_err.log", ex.Message + "\r\n" + ex.StackTrace);
                 return false;
             }
         }

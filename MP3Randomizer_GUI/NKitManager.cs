@@ -1,6 +1,8 @@
 ﻿using Nanook.NKit;
+using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace MP3Randomizer_GUI
@@ -25,6 +27,8 @@ namespace MP3Randomizer_GUI
                         throw new System.Exception();
                     if (ndisc.ExtractBasicInfo().Id.Substring(0,6) != "RM3E01")
                         throw new System.Exception();
+                    LogManager.Log("nkit.log", "Found Metroid Prime 3 - Corruption NTSC iso");
+                    LogManager.Log("nkit.log", "Extracting files...");
                     ndisc.ExtractFiles(ext_f => true,
                     (f, ext_f) =>
                     {
@@ -33,13 +37,16 @@ namespace MP3Randomizer_GUI
                             path += @"\" + ext_f.Path;
                         if (!Directory.Exists(path))
                             Directory.CreateDirectory(path);
+                        LogManager.Log("nkit.log", "["+ (ext_f.PartitionId == null ? @"sys" : @"files") + "] Extracting "+ext_f.Path+"...");
                         using (var stream = File.OpenWrite(path + @"\" + ext_f.Name))
                             f.Copy(stream, ext_f.Length);
                     });
+                    LogManager.Log("nkit.log", "Extracted "+Directory.EnumerateFiles(@".\tmp\nkit", "*.*", SearchOption.AllDirectories).ToArray().Length+ " files!");
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogManager.Log("nkit_err.log", ex.Message + "\r\n" + ex.StackTrace);
                 result = false;
             }
             if (Directory.Exists(@".\Dats"))
@@ -54,6 +61,7 @@ namespace MP3Randomizer_GUI
             {
                 try
                 {
+                    LogManager.Log("nkit.log", "Extracting disc infos...");
                     File.WriteAllBytes(@".\tmp\nkit\nkit_files.zip", Properties.Resources.RM3E01_nkit);
                     ZipFile.ExtractToDirectory(@".\tmp\nkit\nkit_files.zip", @".\tmp\nkit\DATA");
                     File.Move(@".\tmp\nkit\DATA\files\main.dol", @".\tmp\nkit\DATA\sys\main.dol");
@@ -64,11 +72,15 @@ namespace MP3Randomizer_GUI
                     File.Delete(@".\tmp\nkit\DATA\files\fst.bin");
                     File.Delete(@".\tmp\nkit\DATA\sys\R3MEhdr.bin");
                     File.Delete(@".\tmp\nkit\DATA\sys\hdr.bin");
+                    LogManager.Log("nkit.log", "Disc infos extracted!");
+                    LogManager.Log("nkit.log", @"Moving .\tmp\nkit to .\tmp\wii");
                     Directory.Move(@".\tmp\nkit", @".\tmp\wii");
+                    LogManager.Log("nkit.log", @"Done!");
                 }
-                catch
+                catch (Exception ex)
                 {
                     Directory.Delete(@".\tmp\nkit", true);
+                    LogManager.Log("nkit_err.log", ex.Message + "\r\n" + ex.StackTrace);
                     result = false;
                 }
             }

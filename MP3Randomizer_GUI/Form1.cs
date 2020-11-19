@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace MP3Randomizer_GUI
@@ -38,6 +39,7 @@ namespace MP3Randomizer_GUI
         readonly Random rand;
         String OutputFileExt = ".iso";
         Config.AppSettings appSettings = new Config.AppSettings();
+        Thread workerThread = null;
         public Form1()
         {
             rand = new Random((int)((DateTime.Now.Ticks / TimeSpan.TicksPerSecond)));
@@ -69,30 +71,64 @@ namespace MP3Randomizer_GUI
                 return Encoding.ASCII.GetString(bR.ReadBytes(6));
             }
         }
+        
+        void NormalizePath(TextBox textBox)
+        {
+            if (textBox.InvokeRequired)
+                textBox.Invoke(new Action(() => NormalizePath(textBox)));
+            else
+                textBox.Text = Path.GetFullPath(textBox.Text);
+        }
 
         void SetProgressStatus(int cur, int max)
         {
-            if (cur != max)
-            {
-                this.toolStripProgressBar1.Visible = true;
-                this.toolStripProgressBar1.Value = (cur * 100) / (max - 1);
-            }
+            if (this.InvokeRequired)
+                this.Invoke(new Action(() => SetProgressStatus(cur, max)));
             else
             {
-                this.toolStripProgressBar1.Visible = false;
-                this.toolStripProgressBar1.Value = 0;
+                if (cur != max)
+                {
+                    this.toolStripProgressBar1.Visible = true;
+                    this.toolStripProgressBar1.Value = (cur * 100) / (max - 1);
+                }
+                else
+                {
+                    this.toolStripProgressBar1.Visible = false;
+                    this.toolStripProgressBar1.Value = 0;
+                }
+                this.toolStripProgressBar1.Invalidate();
+                this.darkStatusStrip1.Update();
             }
-            this.toolStripProgressBar1.Invalidate();
-            this.darkStatusStrip1.Update();
         }
 
         void SetStatus(String status, int cur = 0, int len = 0)
         {
-            this.toolStripStatusLabel1.Text = "Status : " + status;
-            if (len > 1)
-                this.toolStripStatusLabel1.Text += " (" + (cur + 1) + " / " + len + ")";
-            this.toolStripStatusLabel1.Invalidate();
-            this.darkStatusStrip1.Update();
+            if (this.InvokeRequired)
+                this.Invoke(new Action(() => SetStatus(status, cur, len)));
+            else
+            {
+                this.toolStripStatusLabel1.Text = "Status : " + status;
+                if (len > 1)
+                    this.toolStripStatusLabel1.Text += " (" + (cur + 1) + " / " + len + ")";
+                this.toolStripStatusLabel1.Invalidate();
+                this.darkStatusStrip1.Update();
+            }
+        }
+
+        String GetControlText(Control control)
+        {
+            if (control.InvokeRequired)
+                return (String)control.Invoke(new Func<String>(() => GetControlText(control)));
+            else
+                return control.Text;
+        }
+
+        bool IsCheckBoxChecked(CheckBox checkBox)
+        {
+            if (checkBox.InvokeRequired)
+                return (bool)checkBox.Invoke(new Func<bool>(() => IsCheckBoxChecked(checkBox)));
+            else
+                return checkBox.Checked;
         }
 
         private void btn_exit_Click(object sender, EventArgs e)
@@ -121,21 +157,16 @@ namespace MP3Randomizer_GUI
             }
         }
 
-        private void txtBox_inputISO_keyPress(object sender, KeyPressEventArgs e)
+        private void txtBox_inputISO_TextChanged(object sender, EventArgs e)
         {
-            if (e.KeyChar != (char)Keys.Enter)
-                return;
-
-            // Normalize path
-            txtBox_inputISO.Text = Path.GetFullPath(txtBox_inputISO.Text);
-
-            if (GetGameID(Path.GetFullPath(txtBox_inputISO.Text)) != "RM3E01")
+            if (GetGameID(Path.GetFullPath(txtBox_inputISO.Text)) == "RM3E01")
             {
-                MessageBox.Show("Please choose a Metroid Prime 3 Corruption NTSC ISO instead!\r\nOnly that version is known to work for now.");
-                return;
+                // Normalize path
+                NormalizePath(txtBox_inputISO);
+
+                appSettings.inputPath = txtBox_inputISO.Text;
+                appSettings.SaveToJson();
             }
-            appSettings.inputPath = txtBox_inputISO.Text;
-            appSettings.SaveToJson();
         }
 
         private void btn_outputISO_Click(object sender, EventArgs e)
@@ -152,16 +183,16 @@ namespace MP3Randomizer_GUI
             }
         }
 
-        private void txtBox_outputPath_keyPress(object sender, KeyPressEventArgs e)
+        private void txtBox_outputPath_TextChanged(object sender, EventArgs e)
         {
-            if (e.KeyChar != (char)Keys.Enter)
-                return;
+            if (Directory.Exists(Path.GetDirectoryName(txtBox_outputPath.Text)))
+            {
+                // Normalize path
+                NormalizePath(txtBox_outputPath);
 
-            // Normalize path
-            txtBox_outputPath.Text = Path.GetFullPath(txtBox_outputPath.Text);
-
-            appSettings.outputPath = txtBox_outputPath.Text;
-            appSettings.SaveToJson();
+                appSettings.outputPath = txtBox_outputPath.Text;
+                appSettings.SaveToJson();
+            }
         }
 
         private void radioBtn_ISO_Type_CheckedChanged(object sender, EventArgs e)
@@ -199,150 +230,167 @@ namespace MP3Randomizer_GUI
 
         void switchMode(bool generating)
         {
-            // Switch all radio buttons to ON/OFF
-            this.radioBtn_ISO_Type.Enabled = this.radioBtn_CISO_Type.Enabled = this.radioBtn_WBFS_Type.Enabled = !generating;
-            // Switch all buttons to ON/OFF (except exit)
-            this.btn_generate.Enabled = this.btn_inputISO.Enabled = this.btn_outputISO.Enabled = !generating;
-            // Switch all text boxes readonly or not
-            this.txtBox_inputISO.ReadOnly = this.txtBox_outputPath.ReadOnly = this.txtBox_seedLayout.ReadOnly = generating;
-            // Switch all check boxes to ON/OFF
-            this.chkBox_fastShipFlying.Enabled = this.chkBox_hyperHints.Enabled = this.chkBox_randomDoorColors.Enabled = this.chkBox_randomWeldingColors.Enabled = !generating;
-            // Switch all combo boxes to ON/OFF
-            this.comboBox_startingItems.Enabled = this.comboBox_startingLocation.Enabled = !generating;
+            if (this.InvokeRequired)
+                this.Invoke(new Action(() => switchMode(generating)));
+            else
+            {
+                // Switch all radio buttons to ON/OFF
+                this.radioBtn_ISO_Type.Enabled = this.radioBtn_CISO_Type.Enabled = this.radioBtn_WBFS_Type.Enabled = !generating;
+                // Switch all buttons to ON/OFF (except exit)
+                this.btn_generate.Enabled = this.btn_inputISO.Enabled = this.btn_outputISO.Enabled = !generating;
+                // Switch all text boxes readonly or not
+                this.txtBox_inputISO.ReadOnly = this.txtBox_outputPath.ReadOnly = this.txtBox_seedLayout.ReadOnly = generating;
+                // Switch all check boxes to ON/OFF
+                this.chkBox_fastShipFlying.Enabled = this.chkBox_hyperHints.Enabled = this.chkBox_randomDoorColors.Enabled = this.chkBox_randomWeldingColors.Enabled = !generating;
+                // Switch all combo boxes to ON/OFF
+                this.comboBox_startingItems.Enabled = this.comboBox_startingLocation.Enabled = !generating;
+            }
         }
 
         private void btn_generate_Click(object sender, EventArgs e)
         {
-            var GameID = default(String);
-            var PatchedGameID = default(String);
-            var preGenerationStepCount = default(int);
-            var generateStepCount = default(int);
-
-            generateStepCount = 3;
-            GameID = GetGameID(this.txtBox_inputISO.Text);
-            if (!Directory.Exists(@".\tmp\wii"))
+            if (txtBox_seedLayout.Text == String.Empty)
             {
+                MessageBox.Show("Please fill in a Seed Layout!");
+                return;
+            }
+
+            workerThread = new Thread(new ThreadStart(() =>
+            {
+                var GameID = default(String);
+                var PatchedGameID = default(String);
+                var preGenerationStepCount = default(int);
+                var generateStepCount = default(int);
+
+                generateStepCount = 3;
+                GameID = GetGameID(this.txtBox_inputISO.Text);
                 switchMode(true);
-                preGenerationStepCount = 3;
-                if (GameID.Length != 6)
+                if (!Directory.Exists(@".\tmp\wii"))
                 {
-                    MessageBox.Show("Invalid input iso supplied!");
-                    switchMode(false);
-                    return;
+                    preGenerationStepCount = 3;
+                    if (GameID.Length != 6)
+                    {
+                        MessageBox.Show("Invalid input iso supplied!");
+                        switchMode(false);
+                        return;
+                    }
+
+                    // Normalize the path
+                    NormalizePath(txtBox_inputISO);
+
+                    SetStatus("Extracting ISO...");
+                    SetProgressStatus(0, preGenerationStepCount + generateStepCount);
+
+                    if (this.txtBox_inputISO.Text.ToLower().EndsWith(".nkit.iso"))
+                    {
+                        if (!NKitManager.ExtractISO(this.txtBox_inputISO.Text))
+                        {
+                            MessageBox.Show("Failed extracting wii iso!");
+                            Directory.Delete(@".\tmp\wii", true);
+                            SetStatus("Idle");
+                            SetProgressStatus(preGenerationStepCount + generateStepCount, preGenerationStepCount + generateStepCount);
+                            switchMode(false);
+                            return;
+                        }
+                    }
+                    else // .ciso or .iso
+                    {
+                        if (!WITManager.ExtractISO(this.txtBox_inputISO.Text))
+                        {
+                            MessageBox.Show("Failed extracting wii iso!");
+                            Directory.Delete(@".\tmp\wii", true);
+                            SetStatus("Idle");
+                            SetProgressStatus(preGenerationStepCount + generateStepCount, preGenerationStepCount + generateStepCount);
+                            switchMode(false);
+                            return;
+                        }
+                    }
+
+                    SetStatus("Backing up files...");
+                    SetProgressStatus(1, preGenerationStepCount + generateStepCount);
+
+                    Directory.CreateDirectory(@".\bak\files");
+                    foreach (var file in FILES_TO_BACKUP)
+                        File.Copy(@".\tmp\wii\DATA\files\" + file, @".\bak\files\" + file, true);
+                    Directory.CreateDirectory(@".\bak\sys");
+                    File.Copy(@".\tmp\wii\DATA\sys\main.dol", @".\bak\sys\main.dol", true);
+
+                    SetStatus("Removing attract videos...");
+                    SetProgressStatus(2, preGenerationStepCount + generateStepCount);
+
+                    File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract01.thp", "");
+                    File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract02.thp", "");
+
+                    if (Directory.Exists(@".\tmp\wii\UPDATE"))
+                        Directory.Delete(@".\tmp\wii\UPDATE");
+                }
+                else
+                {
+                    preGenerationStepCount = 1;
+
+                    SetStatus("Restoring backup...");
+                    SetProgressStatus(0, preGenerationStepCount + generateStepCount);
+
+                    foreach (var file in FILES_TO_BACKUP)
+                        File.Copy(@".\bak\files\" + file, @".\tmp\wii\DATA\files\" + file, true);
+                    File.Copy(@".\bak\sys\main.dol", @".\tmp\wii\DATA\sys\main.dol", true);
                 }
 
                 // Normalize the path
-                this.txtBox_inputISO.Text = Path.GetFullPath(this.txtBox_inputISO.Text);
+                NormalizePath(txtBox_outputPath);
 
-                SetStatus("Extracting ISO...");
-                SetProgressStatus(0, preGenerationStepCount + generateStepCount);
+                SetStatus("Randomizing game with given seed layout...");
+                SetProgressStatus(preGenerationStepCount, preGenerationStepCount + generateStepCount);
 
-                if (this.txtBox_inputISO.Text.ToLower().EndsWith(".nkit.iso"))
+                PatcherManager.Patch(new Dictionary<String, String>() {
+                    { "input-path", Path.GetFullPath(@".\bak\files").Replace("\\", "/") + "/" },
+                    { "output-path", Path.GetFullPath(@".\tmp\wii\DATA\files").Replace("\\", "/") + "/" },
+                    { "layout", GetControlText(this.txtBox_seedLayout) },
+                    { "starting-items", GetControlText(this.comboBox_startingItems) },
+                    { "starting-location", GetControlText(this.comboBox_startingLocation) },
+                    { "random-door-colors", IsCheckBoxChecked(this.chkBox_randomDoorColors) ? "true":"false" },
+                    { "random-welding-colors", IsCheckBoxChecked(this.chkBox_randomWeldingColors) ? "true":"false" },
+                    { "fast-flying",IsCheckBoxChecked(this.chkBox_fastShipFlying) ? "true":"false" },
+                    { "hyper-hints", IsCheckBoxChecked(this.chkBox_hyperHints) ? "true":"false" }
+                });
+
+                SetStatus("Applying dol patches...");
+                SetProgressStatus(preGenerationStepCount + 1, preGenerationStepCount + generateStepCount);
+                Patcher.Patcher.Init(GameID[3]);
+
+                PatchedGameID = GameID.Substring(0, 4) + RandomizeDeveloperCode();
+
+                Patcher.Patcher.SetSaveFilename(PatchedGameID.Substring(4, 2) + ".bin");
+
+                SetStatus("Creating " + OutputFileExt.Substring(1).ToUpper() + " file...");
+                SetProgressStatus(preGenerationStepCount + 2, preGenerationStepCount + generateStepCount);
+
+                if (OutputFileExt == ".iso")
                 {
-                    if(!NKitManager.ExtractISO(this.txtBox_inputISO.Text))
-                    {
-                        MessageBox.Show("Failed extracting wii iso!");
-                        SetStatus("Idle");
-                        SetProgressStatus(preGenerationStepCount + generateStepCount, preGenerationStepCount + generateStepCount);
-                        switchMode(false);
-                        return;
-                    }
+                    Directory.CreateDirectory(this.txtBox_outputPath.Text);
+                    WITManager.CreateISO(@".\tmp\mp3.iso", PatchedGameID);
+                    File.Move(@".\tmp\mp3.iso", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "].iso");
                 }
-                else // .ciso or .iso
+                if (OutputFileExt == ".ciso")
                 {
-                    if(!WITManager.ExtractISO(this.txtBox_inputISO.Text))
-                    {
-                        MessageBox.Show("Failed extracting wii iso!");
-                        SetStatus("Idle");
-                        SetProgressStatus(preGenerationStepCount + generateStepCount, preGenerationStepCount + generateStepCount);
-                        switchMode(false);
-                        return;
-                    }
+                    Directory.CreateDirectory(this.txtBox_outputPath.Text);
+                    WITManager.CreateCISO(@".\tmp\mp3.ciso", PatchedGameID);
+                    File.Move(@".\tmp\mp3.ciso", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "].ciso");
+                }
+                if (OutputFileExt == ".wbfs")
+                {
+                    Directory.CreateDirectory(this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "]");
+                    WITManager.CreateWBFS(@".\tmp\mp3.wbfs", PatchedGameID);
+                    File.Move(@".\tmp\mp3.wbfs", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + @"]\" + PatchedGameID + ".wbfs");
                 }
 
-                SetStatus("Backing up files...");
-                SetProgressStatus(1, preGenerationStepCount + generateStepCount);
+                SetStatus("Idle");
+                SetProgressStatus(preGenerationStepCount + 3, preGenerationStepCount + generateStepCount);
+                switchMode(false);
 
-                Directory.CreateDirectory(@".\bak\files");
-                foreach(var file in FILES_TO_BACKUP)
-                    File.Copy(@".\tmp\wii\DATA\files\" + file, @".\bak\files\" + file, true);
-                Directory.CreateDirectory(@".\bak\sys");
-                File.Copy(@".\tmp\wii\DATA\sys\main.dol", @".\bak\sys\main.dol", true);
-
-                SetStatus("Removing attract videos...");
-                SetProgressStatus(2, preGenerationStepCount + generateStepCount);
-
-                File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract01.thp", "");
-                File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract02.thp", "");
-
-                if(!Directory.Exists(@".\tmp\wii\UPDATE"))
-                    Directory.Delete(@".\tmp\wii\UPDATE");
-            }
-            else
-            {
-                preGenerationStepCount = 1;
-
-                SetStatus("Restoring backup...");
-                SetProgressStatus(0, preGenerationStepCount + generateStepCount);
-
-                foreach (var file in FILES_TO_BACKUP)
-                    File.Copy(@".\bak\files\" + file, @".\tmp\wii\DATA\files\" + file, true);
-                File.Copy(@".\bak\sys\main.dol", @".\tmp\wii\DATA\sys\main.dol", true);
-            }
-
-            // Normalize the path
-            this.txtBox_outputPath.Text = Path.GetFullPath(this.txtBox_outputPath.Text);
-
-            SetStatus("Randomizing game with given seed layout...");
-            SetProgressStatus(preGenerationStepCount, preGenerationStepCount + generateStepCount);
-
-            PatcherManager.Patch(new Dictionary<String, String>() {
-                { "input-path", this.lbl_inputISO.Text },
-                { "output-path", this.lbl_outputISO.Text },
-                { "layout", this.lbl_seedLayout.Text },
-                { "starting-items", this.comboBox_startingItems.Text },
-                { "starting-location", this.comboBox_startingLocation.Text },
-                { "random-door-colors", this.chkBox_randomDoorColors.Checked ? "true":"false" },
-                { "random-welding-colors", this.chkBox_randomWeldingColors.Checked ? "true":"false" },
-                { "fast-flying", this.chkBox_fastShipFlying.Checked ? "true":"false" },
-                { "hyper-hints", this.chkBox_hyperHints.Checked ? "true":"false" }
-            });
-
-            SetStatus("Applying dol patches...");
-            SetProgressStatus(preGenerationStepCount + 1, preGenerationStepCount + generateStepCount);
-            Patcher.Patcher.Init(GameID[3]);
-
-            PatchedGameID = GameID.Substring(0, 4) + RandomizeDeveloperCode();
-
-            Patcher.Patcher.SetSaveFilename(PatchedGameID.Substring(4, 2)+".bin");
-
-            SetStatus("Creating "+OutputFileExt.Substring(1).ToUpper()+" file...");
-            SetProgressStatus(preGenerationStepCount + 2, preGenerationStepCount + generateStepCount);
-
-            if (OutputFileExt == ".iso")
-            {
-                Directory.CreateDirectory(this.txtBox_outputPath.Text);
-                WITManager.CreateISO(@".\tmp\mp3.iso", PatchedGameID);
-                File.Move(@".\tmp\mp3.iso", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "].iso");
-            }
-            if (OutputFileExt == ".ciso")
-            {
-                Directory.CreateDirectory(this.txtBox_outputPath.Text);
-                WITManager.CreateCISO(@".\tmp\mp3.ciso", PatchedGameID);
-                File.Move(@".\tmp\mp3.ciso", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "].ciso");
-            }
-            if (OutputFileExt == ".wbfs")
-            {
-                Directory.CreateDirectory(this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "]");
-                WITManager.CreateWBFS(@".\tmp\mp3.wbfs", PatchedGameID);
-                File.Move(@".\tmp\mp3.wbfs", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + @"]\" +PatchedGameID+".wbfs");
-            }
-
-            SetStatus("Idle");
-            SetProgressStatus(preGenerationStepCount + 3, preGenerationStepCount + generateStepCount);
-            switchMode(false);
-
-            MessageBox.Show("Corruption ISO has been randomized! Have fun!");
+                MessageBox.Show("Corruption ISO has been randomized! Have fun!");
+            }));
+            workerThread.Start();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -386,12 +434,21 @@ namespace MP3Randomizer_GUI
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
+            // is generating randomized ISO
+            if (workerThread != null)
+            {
+                if (workerThread.IsAlive)
+                    workerThread.Abort();
+
+                workerThread = null;
+            }
+
             // cancels any pending randomization
-            foreach(var proc in Process.GetProcessesByName("MP3Randomizer"))
-                proc.Close();
+            foreach (var proc in Process.GetProcessesByName("MP3Randomizer"))
+                proc.Kill();
             // cancels any ISO extraction/creation
             foreach (var proc in Process.GetProcessesByName("wit"))
-                proc.Close();
+                proc.Kill();
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)

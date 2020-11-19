@@ -63,6 +63,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="LogManager.cs" />
     <Compile Include="NKitManager.cs" />
     <Compile Include="Patcher\DolPatch.cs" />
     <Compile Include="Patcher\Patcher.cs" />
