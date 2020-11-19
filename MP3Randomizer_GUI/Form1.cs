@@ -262,133 +262,142 @@ namespace MP3Randomizer_GUI
                 var preGenerationStepCount = default(int);
                 var generateStepCount = default(int);
 
-                generateStepCount = 3;
-                GameID = GetGameID(this.txtBox_inputISO.Text);
-                switchMode(true);
-                if (!Directory.Exists(@".\tmp\wii"))
+                try
                 {
-                    preGenerationStepCount = 3;
-                    if (GameID.Length != 6)
+                    generateStepCount = 3;
+                    GameID = GetGameID(this.txtBox_inputISO.Text);
+                    switchMode(true);
+                    if (!Directory.Exists(@".\tmp\wii"))
                     {
-                        MessageBox.Show("Invalid input iso supplied!");
-                        switchMode(false);
-                        return;
+                        preGenerationStepCount = 3;
+                        if (GameID.Length != 6)
+                        {
+                            MessageBox.Show("Invalid input iso supplied!");
+                            switchMode(false);
+                            return;
+                        }
+
+                        // Normalize the path
+                        NormalizePath(txtBox_inputISO);
+
+                        SetStatus("Extracting ISO...");
+                        SetProgressStatus(0, preGenerationStepCount + generateStepCount);
+
+                        if (this.txtBox_inputISO.Text.ToLower().EndsWith(".nkit.iso"))
+                        {
+                            if (!NKitManager.ExtractISO(this.txtBox_inputISO.Text))
+                            {
+                                MessageBox.Show("Failed extracting wii iso!");
+                                Directory.Delete(@".\tmp\wii", true);
+                                SetStatus("Idle");
+                                SetProgressStatus(preGenerationStepCount + generateStepCount, preGenerationStepCount + generateStepCount);
+                                switchMode(false);
+                                return;
+                            }
+                        }
+                        else // .ciso or .iso
+                        {
+                            if (!WITManager.ExtractISO(this.txtBox_inputISO.Text))
+                            {
+                                MessageBox.Show("Failed extracting wii iso!");
+                                Directory.Delete(@".\tmp\wii", true);
+                                SetStatus("Idle");
+                                SetProgressStatus(preGenerationStepCount + generateStepCount, preGenerationStepCount + generateStepCount);
+                                switchMode(false);
+                                return;
+                            }
+                        }
+
+                        SetStatus("Backing up files...");
+                        SetProgressStatus(1, preGenerationStepCount + generateStepCount);
+
+                        Directory.CreateDirectory(@".\bak\files");
+                        foreach (var file in FILES_TO_BACKUP)
+                            File.Copy(@".\tmp\wii\DATA\files\" + file, @".\bak\files\" + file, true);
+                        Directory.CreateDirectory(@".\bak\sys");
+                        File.Copy(@".\tmp\wii\DATA\sys\main.dol", @".\bak\sys\main.dol", true);
+
+                        SetStatus("Removing attract videos...");
+                        SetProgressStatus(2, preGenerationStepCount + generateStepCount);
+
+                        File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract01.thp", "");
+                        File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract02.thp", "");
+
+                        if (Directory.Exists(@".\tmp\wii\UPDATE"))
+                            Directory.Delete(@".\tmp\wii\UPDATE");
+                    }
+                    else
+                    {
+                        preGenerationStepCount = 1;
+
+                        SetStatus("Restoring backup...");
+                        SetProgressStatus(0, preGenerationStepCount + generateStepCount);
+
+                        foreach (var file in FILES_TO_BACKUP)
+                            File.Copy(@".\bak\files\" + file, @".\tmp\wii\DATA\files\" + file, true);
+                        File.Copy(@".\bak\sys\main.dol", @".\tmp\wii\DATA\sys\main.dol", true);
                     }
 
                     // Normalize the path
-                    NormalizePath(txtBox_inputISO);
+                    NormalizePath(txtBox_outputPath);
 
-                    SetStatus("Extracting ISO...");
-                    SetProgressStatus(0, preGenerationStepCount + generateStepCount);
+                    SetStatus("Randomizing game with given seed layout...");
+                    SetProgressStatus(preGenerationStepCount, preGenerationStepCount + generateStepCount);
 
-                    if (this.txtBox_inputISO.Text.ToLower().EndsWith(".nkit.iso"))
+                    PatcherManager.Patch(new Dictionary<String, String>() {
+                        { "input-path", Path.GetFullPath(@".\bak\files").Replace("\\", "/") + "/" },
+                        { "output-path", Path.GetFullPath(@".\tmp\wii\DATA\files").Replace("\\", "/") + "/" },
+                        { "layout", GetControlText(this.txtBox_seedLayout) },
+                        { "starting-items", GetControlText(this.comboBox_startingItems) },
+                        { "starting-location", GetControlText(this.comboBox_startingLocation) },
+                        { "random-door-colors", IsCheckBoxChecked(this.chkBox_randomDoorColors) ? "true":"false" },
+                        { "random-welding-colors", IsCheckBoxChecked(this.chkBox_randomWeldingColors) ? "true":"false" },
+                        { "fast-flying",IsCheckBoxChecked(this.chkBox_fastShipFlying) ? "true":"false" },
+                        { "hyper-hints", IsCheckBoxChecked(this.chkBox_hyperHints) ? "true":"false" }
+                    });
+
+                    SetStatus("Applying dol patches...");
+                    SetProgressStatus(preGenerationStepCount + 1, preGenerationStepCount + generateStepCount);
+                    Patcher.Patcher.Init(GameID[3]);
+
+                    PatchedGameID = GameID.Substring(0, 4) + RandomizeDeveloperCode();
+
+                    Patcher.Patcher.SetSaveFilename(PatchedGameID.Substring(4, 2) + ".bin");
+
+                    SetStatus("Creating " + OutputFileExt.Substring(1).ToUpper() + " file...");
+                    SetProgressStatus(preGenerationStepCount + 2, preGenerationStepCount + generateStepCount);
+
+                    if (OutputFileExt == ".iso")
                     {
-                        if (!NKitManager.ExtractISO(this.txtBox_inputISO.Text))
-                        {
-                            MessageBox.Show("Failed extracting wii iso!");
-                            Directory.Delete(@".\tmp\wii", true);
-                            SetStatus("Idle");
-                            SetProgressStatus(preGenerationStepCount + generateStepCount, preGenerationStepCount + generateStepCount);
-                            switchMode(false);
-                            return;
-                        }
+                        Directory.CreateDirectory(this.txtBox_outputPath.Text);
+                        WITManager.CreateISO(@".\tmp\mp3.iso", PatchedGameID);
+                        File.Move(@".\tmp\mp3.iso", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "].iso");
                     }
-                    else // .ciso or .iso
+                    if (OutputFileExt == ".ciso")
                     {
-                        if (!WITManager.ExtractISO(this.txtBox_inputISO.Text))
-                        {
-                            MessageBox.Show("Failed extracting wii iso!");
-                            Directory.Delete(@".\tmp\wii", true);
-                            SetStatus("Idle");
-                            SetProgressStatus(preGenerationStepCount + generateStepCount, preGenerationStepCount + generateStepCount);
-                            switchMode(false);
-                            return;
-                        }
+                        Directory.CreateDirectory(this.txtBox_outputPath.Text);
+                        WITManager.CreateCISO(@".\tmp\mp3.ciso", PatchedGameID);
+                        File.Move(@".\tmp\mp3.ciso", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "].ciso");
+                    }
+                    if (OutputFileExt == ".wbfs")
+                    {
+                        Directory.CreateDirectory(this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "]");
+                        WITManager.CreateWBFS(@".\tmp\mp3.wbfs", PatchedGameID);
+                        File.Move(@".\tmp\mp3.wbfs", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + @"]\" + PatchedGameID + ".wbfs");
                     }
 
-                    SetStatus("Backing up files...");
-                    SetProgressStatus(1, preGenerationStepCount + generateStepCount);
+                    SetStatus("Idle");
+                    SetProgressStatus(preGenerationStepCount + 3, preGenerationStepCount + generateStepCount);
+                    switchMode(false);
 
-                    Directory.CreateDirectory(@".\bak\files");
-                    foreach (var file in FILES_TO_BACKUP)
-                        File.Copy(@".\tmp\wii\DATA\files\" + file, @".\bak\files\" + file, true);
-                    Directory.CreateDirectory(@".\bak\sys");
-                    File.Copy(@".\tmp\wii\DATA\sys\main.dol", @".\bak\sys\main.dol", true);
-
-                    SetStatus("Removing attract videos...");
-                    SetProgressStatus(2, preGenerationStepCount + generateStepCount);
-
-                    File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract01.thp", "");
-                    File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract02.thp", "");
-
-                    if (Directory.Exists(@".\tmp\wii\UPDATE"))
-                        Directory.Delete(@".\tmp\wii\UPDATE");
+                    MessageBox.Show("Corruption ISO has been randomized! Have fun!");
+                } catch (Exception ex) {
+                    MessageBox.Show("An error occured while generating the randomized game!\r\nCheck err.log for more details!");
+                    LogManager.Log("err.log", ex.Message + "\r\n" + ex.StackTrace);
+                    SetStatus("Idle");
+                    SetProgressStatus(preGenerationStepCount + 3, preGenerationStepCount + generateStepCount);
+                    switchMode(false);
                 }
-                else
-                {
-                    preGenerationStepCount = 1;
-
-                    SetStatus("Restoring backup...");
-                    SetProgressStatus(0, preGenerationStepCount + generateStepCount);
-
-                    foreach (var file in FILES_TO_BACKUP)
-                        File.Copy(@".\bak\files\" + file, @".\tmp\wii\DATA\files\" + file, true);
-                    File.Copy(@".\bak\sys\main.dol", @".\tmp\wii\DATA\sys\main.dol", true);
-                }
-
-                // Normalize the path
-                NormalizePath(txtBox_outputPath);
-
-                SetStatus("Randomizing game with given seed layout...");
-                SetProgressStatus(preGenerationStepCount, preGenerationStepCount + generateStepCount);
-
-                PatcherManager.Patch(new Dictionary<String, String>() {
-                    { "input-path", Path.GetFullPath(@".\bak\files").Replace("\\", "/") + "/" },
-                    { "output-path", Path.GetFullPath(@".\tmp\wii\DATA\files").Replace("\\", "/") + "/" },
-                    { "layout", GetControlText(this.txtBox_seedLayout) },
-                    { "starting-items", GetControlText(this.comboBox_startingItems) },
-                    { "starting-location", GetControlText(this.comboBox_startingLocation) },
-                    { "random-door-colors", IsCheckBoxChecked(this.chkBox_randomDoorColors) ? "true":"false" },
-                    { "random-welding-colors", IsCheckBoxChecked(this.chkBox_randomWeldingColors) ? "true":"false" },
-                    { "fast-flying",IsCheckBoxChecked(this.chkBox_fastShipFlying) ? "true":"false" },
-                    { "hyper-hints", IsCheckBoxChecked(this.chkBox_hyperHints) ? "true":"false" }
-                });
-
-                SetStatus("Applying dol patches...");
-                SetProgressStatus(preGenerationStepCount + 1, preGenerationStepCount + generateStepCount);
-                Patcher.Patcher.Init(GameID[3]);
-
-                PatchedGameID = GameID.Substring(0, 4) + RandomizeDeveloperCode();
-
-                Patcher.Patcher.SetSaveFilename(PatchedGameID.Substring(4, 2) + ".bin");
-
-                SetStatus("Creating " + OutputFileExt.Substring(1).ToUpper() + " file...");
-                SetProgressStatus(preGenerationStepCount + 2, preGenerationStepCount + generateStepCount);
-
-                if (OutputFileExt == ".iso")
-                {
-                    Directory.CreateDirectory(this.txtBox_outputPath.Text);
-                    WITManager.CreateISO(@".\tmp\mp3.iso", PatchedGameID);
-                    File.Move(@".\tmp\mp3.iso", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "].iso");
-                }
-                if (OutputFileExt == ".ciso")
-                {
-                    Directory.CreateDirectory(this.txtBox_outputPath.Text);
-                    WITManager.CreateCISO(@".\tmp\mp3.ciso", PatchedGameID);
-                    File.Move(@".\tmp\mp3.ciso", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "].ciso");
-                }
-                if (OutputFileExt == ".wbfs")
-                {
-                    Directory.CreateDirectory(this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + "]");
-                    WITManager.CreateWBFS(@".\tmp\mp3.wbfs", PatchedGameID);
-                    File.Move(@".\tmp\mp3.wbfs", this.txtBox_outputPath.Text + @"\Metroid Prime 3 - Corruption [" + PatchedGameID + @"]\" + PatchedGameID + ".wbfs");
-                }
-
-                SetStatus("Idle");
-                SetProgressStatus(preGenerationStepCount + 3, preGenerationStepCount + generateStepCount);
-                switchMode(false);
-
-                MessageBox.Show("Corruption ISO has been randomized! Have fun!");
             }));
             workerThread.Start();
         }

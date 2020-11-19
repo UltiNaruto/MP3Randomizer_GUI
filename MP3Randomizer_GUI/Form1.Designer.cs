@@ -73,7 +73,7 @@
             this.lbl_appTitle.Name = "lbl_appTitle";
             this.lbl_appTitle.Size = new System.Drawing.Size(330, 29);
             this.lbl_appTitle.TabIndex = 0;
-            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.1";
+            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.2";
             // 
             // tableLayoutPanel1
             // 
