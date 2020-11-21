@@ -324,7 +324,7 @@ namespace MP3Randomizer_GUI
                         File.WriteAllText(@".\tmp\wii\DATA\files\Video\FrontEnd\attract02.thp", "");
 
                         if (Directory.Exists(@".\tmp\wii\UPDATE"))
-                            Directory.Delete(@".\tmp\wii\UPDATE");
+                            Directory.Delete(@".\tmp\wii\UPDATE", true);
                     }
                     else
                     {
