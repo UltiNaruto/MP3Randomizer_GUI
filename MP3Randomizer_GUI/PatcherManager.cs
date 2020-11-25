@@ -22,7 +22,7 @@ namespace MP3Randomizer_GUI
                         if (setting.Value == "true")
                             args += "--" + setting.Key;
                         else
-                            args += "--" + setting.Key + " \"" + setting.Value+"\"";
+                            args += "--" + setting.Key + " " + setting.Value;
                     }
                 }
 

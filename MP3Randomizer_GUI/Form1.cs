@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -37,6 +38,7 @@ namespace MP3Randomizer_GUI
             "Standard.ntwk"
         };
         readonly Random rand;
+        String custom_items = "";
         String OutputFileExt = ".iso";
         Config.AppSettings appSettings = new Config.AppSettings();
         Thread workerThread = null;
@@ -45,6 +47,55 @@ namespace MP3Randomizer_GUI
             rand = new Random((int)((DateTime.Now.Ticks / TimeSpan.TicksPerSecond)));
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Application.ExecutablePath));
             InitializeComponent();
+        }
+
+        DialogResult InputDialog(string promptText, ref String value)
+        {
+            var form = default(Form);
+            var label = default(Label);
+            var textBox = default(TextBox);
+            var buttonOk = default(Button);
+            var buttonCancel = default(Button);
+            var dialogResult = default(DialogResult);
+
+            form = new DarkUI.Forms.DarkForm();
+            label = new DarkUI.Controls.DarkLabel();
+            textBox = new DarkUI.Controls.DarkTextBox();
+            buttonOk = new DarkUI.Controls.DarkButton();
+            buttonCancel = new DarkUI.Controls.DarkButton();
+            form.Text = this.Text;
+            label.Text = promptText;
+            //textBox.Text = value;
+
+            buttonOk.Text = "OK";
+            buttonCancel.Text = "Cancel";
+            buttonOk.DialogResult = DialogResult.OK;
+            buttonCancel.DialogResult = DialogResult.Cancel;
+
+            label.SetBounds(9, 20, 372, 13);
+            textBox.SetBounds(12, 36, 372, 20);
+            buttonOk.SetBounds(228, 72, 75, 23);
+            buttonCancel.SetBounds(309, 72, 75, 23);
+
+            label.AutoSize = true;
+            textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
+            buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            form.ClientSize = new Size(396, 107);
+            form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
+            form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
+            form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.MinimizeBox = false;
+            form.MaximizeBox = false;
+            form.AcceptButton = buttonOk;
+            form.CancelButton = buttonCancel;
+
+            dialogResult = form.ShowDialog();
+            value = textBox.Text;
+
+            return dialogResult;
         }
 
         String RandomizeDeveloperCode()
@@ -261,6 +312,7 @@ namespace MP3Randomizer_GUI
                 var PatchedGameID = default(String);
                 var preGenerationStepCount = default(int);
                 var generateStepCount = default(int);
+                var startingItems = default(String);
 
                 try
                 {
@@ -344,11 +396,15 @@ namespace MP3Randomizer_GUI
                     SetStatus("Randomizing game with given seed layout...");
                     SetProgressStatus(preGenerationStepCount, preGenerationStepCount + generateStepCount);
 
+                    startingItems = GetControlText(this.comboBox_startingItems);
+                    if (startingItems == "custom")
+                        startingItems += " " + custom_items;
+
                     PatcherManager.Patch(new Dictionary<String, String>() {
                         { "input-path", Path.GetFullPath(@".\bak\files").Replace("\\", "/") + "/" },
                         { "output-path", Path.GetFullPath(@".\tmp\wii\DATA\files").Replace("\\", "/") + "/" },
                         { "layout", GetControlText(this.txtBox_seedLayout) },
-                        { "starting-items", GetControlText(this.comboBox_startingItems) },
+                        { "starting-items", startingItems },
                         { "starting-location", GetControlText(this.comboBox_startingLocation) },
                         { "random-door-colors", IsCheckBoxChecked(this.chkBox_randomDoorColors) ? "true":"false" },
                         { "random-welding-colors", IsCheckBoxChecked(this.chkBox_randomWeldingColors) ? "true":"false" },
@@ -466,6 +522,23 @@ namespace MP3Randomizer_GUI
             {
                 ReleaseCapture();
                 SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
+        }
+
+        private void comboBox_startingItems_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(comboBox_startingItems.SelectedIndex == comboBox_startingItems.Items.Count - 1)
+            {
+                if(InputDialog("Input your custom items here :", ref custom_items) == DialogResult.OK)
+                {
+                    if(custom_items.Length != 43)
+                    {
+                        MessageBox.Show(String.Format("The custom items has invalid length (length : {0} | expected length : 43)", custom_items.Length));
+                        custom_items = "";
+                        comboBox_startingItems.SelectedIndex = 0;
+                        return;
+                    }
+                }
             }
         }
     }

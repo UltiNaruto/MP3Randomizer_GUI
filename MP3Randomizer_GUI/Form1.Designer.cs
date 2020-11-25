@@ -73,7 +73,7 @@
             this.lbl_appTitle.Name = "lbl_appTitle";
             this.lbl_appTitle.Size = new System.Drawing.Size(330, 29);
             this.lbl_appTitle.TabIndex = 0;
-            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.4";
+            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.5";
             // 
             // tableLayoutPanel1
             // 
@@ -344,12 +344,14 @@
             "post-norion-no-lasso",
             "post-norion-no-command",
             "post-norion-no-lasso-no-command",
-            "minimal"});
+            "minimal",
+            "custom"});
             this.comboBox_startingItems.Location = new System.Drawing.Point(365, 41);
             this.comboBox_startingItems.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.comboBox_startingItems.Name = "comboBox_startingItems";
             this.comboBox_startingItems.Size = new System.Drawing.Size(357, 21);
             this.comboBox_startingItems.TabIndex = 14;
+            this.comboBox_startingItems.SelectedIndexChanged += new System.EventHandler(this.comboBox_startingItems_SelectedIndexChanged);
             // 
             // lbl_startingItems
             // 
