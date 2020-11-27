@@ -52,12 +52,18 @@ namespace MP3Randomizer_GUI
         {
             try
             {
+                if (!Directory.Exists(@".\tmp\wii"))
+                {
+                    LogManager.Log("wit_err.log", @".\tmp\wii doesn't exist");
+                    return false;
+                }
+
                 using (var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = WIT_PATH,
-                        Arguments = "COPY \".\\tmp\\wii\" -d \"" + filename + "\" --id \"" + GameCode + "\" --auto-split --overwrite",
+                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" --id \"" + GameCode + "\" --auto-split --overwrite",
                         WorkingDirectory = Directory.GetCurrentDirectory(),
                         CreateNoWindow = true,
                         UseShellExecute = false,
@@ -86,12 +92,17 @@ namespace MP3Randomizer_GUI
         {
             try
             {
+                if (!Directory.Exists(@".\tmp\wii"))
+                {
+                    LogManager.Log("wit_err.log", @".\tmp\wii doesn't exist");
+                    return false;
+                }
                 using (var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = WIT_PATH,
-                        Arguments = "COPY \".\\tmp\\wii\" -d \"" + filename + "\" -C --id \"" + GameCode + "\" -z --trunc --auto-split --overwrite",
+                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" -C --id \"" + GameCode + "\" -z --trunc --auto-split --overwrite",
                         WorkingDirectory = Directory.GetCurrentDirectory(),
                         CreateNoWindow = true,
                         UseShellExecute = false,
@@ -120,12 +131,17 @@ namespace MP3Randomizer_GUI
         {
             try
             {
+                if (!Directory.Exists(@".\tmp\wii"))
+                {
+                    LogManager.Log("wit_err.log", @".\tmp\wii doesn't exist");
+                    return false;
+                }
                 using (var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = WIT_PATH,
-                        Arguments = "COPY \".\\tmp\\wii\" -d \"" + filename + "\" -B --id \"" + GameCode + "\" -z --trunc --auto-split --overwrite",
+                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" -B --id \"" + GameCode + "\" -z --trunc --auto-split --overwrite",
                         WorkingDirectory = Directory.GetCurrentDirectory(),
                         CreateNoWindow = true,
                         UseShellExecute = false,
@@ -154,11 +170,15 @@ namespace MP3Randomizer_GUI
         {
             try
             {
+                if (Directory.Exists(@".\bak"))
+                    Directory.Delete(@".\bak", true);
+                if (Directory.Exists(@".\tmp\wii"))
+                    Directory.Delete(@".\tmp\wii", true);
                 using (var proc = new Process {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = WIT_PATH,
-                        Arguments = "EXTRACT \"" + filename + "\" -d \".\\tmp\\wii\"",
+                        Arguments = "EXTRACT \"" + filename + "\" -d .\\tmp\\wii",
                         WorkingDirectory = Directory.GetCurrentDirectory(),
                         CreateNoWindow = true,
                         UseShellExecute = false,

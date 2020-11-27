@@ -58,6 +58,9 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.btn_exit = new DarkUI.Controls.DarkButton();
+            this.chkBox_skipPhaaze = new DarkUI.Controls.DarkCheckBox();
+            this.chkBox_requireLauncher = new DarkUI.Controls.DarkCheckBox();
+            this.chkBox_requireShipMissile = new DarkUI.Controls.DarkCheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -73,7 +76,7 @@
             this.lbl_appTitle.Name = "lbl_appTitle";
             this.lbl_appTitle.Size = new System.Drawing.Size(330, 29);
             this.lbl_appTitle.TabIndex = 0;
-            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.5";
+            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.6";
             // 
             // tableLayoutPanel1
             // 
@@ -106,7 +109,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 425);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 453);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
             // lbl_inputISO
@@ -298,26 +301,31 @@
             this.tableLayoutPanel3.Controls.Add(this.comboBox_startingLocation, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.chkBox_randomDoorColors, 0, 2);
             this.tableLayoutPanel3.Controls.Add(this.chkBox_fastShipFlying, 0, 3);
+            this.tableLayoutPanel3.Controls.Add(this.chkBox_skipPhaaze, 0, 5);
+            this.tableLayoutPanel3.Controls.Add(this.chkBox_requireLauncher, 0, 4);
+            this.tableLayoutPanel3.Controls.Add(this.chkBox_requireShipMissile, 1, 4);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 252);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 4;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(725, 141);
+            this.tableLayoutPanel3.RowCount = 6;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(725, 169);
             this.tableLayoutPanel3.TabIndex = 11;
             // 
             // chkBox_hyperHints
             // 
             this.chkBox_hyperHints.AutoSize = true;
             this.chkBox_hyperHints.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkBox_hyperHints.Location = new System.Drawing.Point(372, 108);
+            this.chkBox_hyperHints.Location = new System.Drawing.Point(372, 87);
             this.chkBox_hyperHints.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
             this.chkBox_hyperHints.Name = "chkBox_hyperHints";
-            this.chkBox_hyperHints.Size = new System.Drawing.Size(126, 26);
+            this.chkBox_hyperHints.Size = new System.Drawing.Size(126, 22);
             this.chkBox_hyperHints.TabIndex = 17;
             this.chkBox_hyperHints.Text = "Hyper Hints";
             // 
@@ -325,10 +333,10 @@
             // 
             this.chkBox_randomWeldingColors.AutoSize = true;
             this.chkBox_randomWeldingColors.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkBox_randomWeldingColors.Location = new System.Drawing.Point(372, 73);
+            this.chkBox_randomWeldingColors.Location = new System.Drawing.Point(372, 59);
             this.chkBox_randomWeldingColors.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
             this.chkBox_randomWeldingColors.Name = "chkBox_randomWeldingColors";
-            this.chkBox_randomWeldingColors.Size = new System.Drawing.Size(227, 26);
+            this.chkBox_randomWeldingColors.Size = new System.Drawing.Size(227, 22);
             this.chkBox_randomWeldingColors.TabIndex = 16;
             this.chkBox_randomWeldingColors.Text = "Random welding colors";
             // 
@@ -338,15 +346,10 @@
             this.comboBox_startingItems.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.comboBox_startingItems.FormattingEnabled = true;
             this.comboBox_startingItems.Items.AddRange(new object[] {
-            "default",
-            "default-with-command",
-            "post-norion",
+            "original-with-command",
             "post-norion-no-lasso",
-            "post-norion-no-command",
-            "post-norion-no-lasso-no-command",
-            "minimal",
             "custom"});
-            this.comboBox_startingItems.Location = new System.Drawing.Point(365, 41);
+            this.comboBox_startingItems.Location = new System.Drawing.Point(365, 34);
             this.comboBox_startingItems.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.comboBox_startingItems.Name = "comboBox_startingItems";
             this.comboBox_startingItems.Size = new System.Drawing.Size(357, 21);
@@ -358,9 +361,9 @@
             this.lbl_startingItems.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbl_startingItems.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbl_startingItems.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
-            this.lbl_startingItems.Location = new System.Drawing.Point(3, 35);
+            this.lbl_startingItems.Location = new System.Drawing.Point(3, 28);
             this.lbl_startingItems.Name = "lbl_startingItems";
-            this.lbl_startingItems.Size = new System.Drawing.Size(356, 35);
+            this.lbl_startingItems.Size = new System.Drawing.Size(356, 28);
             this.lbl_startingItems.TabIndex = 13;
             this.lbl_startingItems.Text = "Starting Items :";
             this.lbl_startingItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -372,7 +375,7 @@
             this.lbl_startingLocation.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
             this.lbl_startingLocation.Location = new System.Drawing.Point(3, 0);
             this.lbl_startingLocation.Name = "lbl_startingLocation";
-            this.lbl_startingLocation.Size = new System.Drawing.Size(356, 35);
+            this.lbl_startingLocation.Size = new System.Drawing.Size(356, 28);
             this.lbl_startingLocation.TabIndex = 11;
             this.lbl_startingLocation.Text = "Starting Location :";
             this.lbl_startingLocation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -383,7 +386,7 @@
             this.comboBox_startingLocation.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.comboBox_startingLocation.FormattingEnabled = true;
             this.comboBox_startingLocation.Items.AddRange(new object[] {
-            "default",
+            "olympus",
             "norion",
             "valhalla"});
             this.comboBox_startingLocation.Location = new System.Drawing.Point(365, 6);
@@ -396,10 +399,10 @@
             // 
             this.chkBox_randomDoorColors.AutoSize = true;
             this.chkBox_randomDoorColors.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkBox_randomDoorColors.Location = new System.Drawing.Point(10, 73);
+            this.chkBox_randomDoorColors.Location = new System.Drawing.Point(10, 59);
             this.chkBox_randomDoorColors.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
             this.chkBox_randomDoorColors.Name = "chkBox_randomDoorColors";
-            this.chkBox_randomDoorColors.Size = new System.Drawing.Size(202, 26);
+            this.chkBox_randomDoorColors.Size = new System.Drawing.Size(202, 22);
             this.chkBox_randomDoorColors.TabIndex = 15;
             this.chkBox_randomDoorColors.Text = "Random door colors";
             // 
@@ -407,17 +410,17 @@
             // 
             this.chkBox_fastShipFlying.AutoSize = true;
             this.chkBox_fastShipFlying.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkBox_fastShipFlying.Location = new System.Drawing.Point(10, 108);
+            this.chkBox_fastShipFlying.Location = new System.Drawing.Point(10, 87);
             this.chkBox_fastShipFlying.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
             this.chkBox_fastShipFlying.Name = "chkBox_fastShipFlying";
-            this.chkBox_fastShipFlying.Size = new System.Drawing.Size(155, 26);
+            this.chkBox_fastShipFlying.Size = new System.Drawing.Size(155, 22);
             this.chkBox_fastShipFlying.TabIndex = 18;
             this.chkBox_fastShipFlying.Text = "Fast ship flying";
             // 
             // btn_generate
             // 
             this.btn_generate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btn_generate.Location = new System.Drawing.Point(3, 396);
+            this.btn_generate.Location = new System.Drawing.Point(3, 424);
             this.btn_generate.Name = "btn_generate";
             this.btn_generate.Padding = new System.Windows.Forms.Padding(5);
             this.btn_generate.Size = new System.Drawing.Size(719, 26);
@@ -433,7 +436,7 @@
             this.darkStatusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripProgressBar1});
-            this.darkStatusStrip1.Location = new System.Drawing.Point(0, 488);
+            this.darkStatusStrip1.Location = new System.Drawing.Point(0, 516);
             this.darkStatusStrip1.Name = "darkStatusStrip1";
             this.darkStatusStrip1.Padding = new System.Windows.Forms.Padding(0, 5, 0, 3);
             this.darkStatusStrip1.Size = new System.Drawing.Size(800, 28);
@@ -466,11 +469,44 @@
             this.btn_exit.Text = "X";
             this.btn_exit.Click += new System.EventHandler(this.btn_exit_Click);
             // 
+            // chkBox_skipPhaaze
+            // 
+            this.chkBox_skipPhaaze.AutoSize = true;
+            this.chkBox_skipPhaaze.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkBox_skipPhaaze.Location = new System.Drawing.Point(10, 143);
+            this.chkBox_skipPhaaze.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
+            this.chkBox_skipPhaaze.Name = "chkBox_skipPhaaze";
+            this.chkBox_skipPhaaze.Size = new System.Drawing.Size(134, 23);
+            this.chkBox_skipPhaaze.TabIndex = 19;
+            this.chkBox_skipPhaaze.Text = "Skip Phaaze";
+            // 
+            // chkBox_requireLauncher
+            // 
+            this.chkBox_requireLauncher.AutoSize = true;
+            this.chkBox_requireLauncher.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkBox_requireLauncher.Location = new System.Drawing.Point(10, 115);
+            this.chkBox_requireLauncher.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
+            this.chkBox_requireLauncher.Name = "chkBox_requireLauncher";
+            this.chkBox_requireLauncher.Size = new System.Drawing.Size(179, 22);
+            this.chkBox_requireLauncher.TabIndex = 20;
+            this.chkBox_requireLauncher.Text = "Require Launcher";
+            // 
+            // chkBox_requireShipMissile
+            // 
+            this.chkBox_requireShipMissile.AutoSize = true;
+            this.chkBox_requireShipMissile.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkBox_requireShipMissile.Location = new System.Drawing.Point(372, 115);
+            this.chkBox_requireShipMissile.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
+            this.chkBox_requireShipMissile.Name = "chkBox_requireShipMissile";
+            this.chkBox_requireShipMissile.Size = new System.Drawing.Size(202, 22);
+            this.chkBox_requireShipMissile.TabIndex = 21;
+            this.chkBox_requireShipMissile.Text = "Require Ship Missile";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 516);
+            this.ClientSize = new System.Drawing.Size(800, 544);
             this.Controls.Add(this.btn_exit);
             this.Controls.Add(this.darkStatusStrip1);
             this.Controls.Add(this.tableLayoutPanel1);
@@ -526,6 +562,9 @@
         private DarkUI.Controls.DarkButton btn_generate;
         private DarkUI.Controls.DarkCheckBox chkBox_hyperHints;
         private DarkUI.Controls.DarkCheckBox chkBox_fastShipFlying;
+        private DarkUI.Controls.DarkCheckBox chkBox_skipPhaaze;
+        private DarkUI.Controls.DarkCheckBox chkBox_requireLauncher;
+        private DarkUI.Controls.DarkCheckBox chkBox_requireShipMissile;
     }
 }
 

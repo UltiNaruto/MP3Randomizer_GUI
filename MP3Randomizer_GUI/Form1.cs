@@ -292,7 +292,7 @@ namespace MP3Randomizer_GUI
                 // Switch all text boxes readonly or not
                 this.txtBox_inputISO.ReadOnly = this.txtBox_outputPath.ReadOnly = this.txtBox_seedLayout.ReadOnly = generating;
                 // Switch all check boxes to ON/OFF
-                this.chkBox_fastShipFlying.Enabled = this.chkBox_hyperHints.Enabled = this.chkBox_randomDoorColors.Enabled = this.chkBox_randomWeldingColors.Enabled = !generating;
+                this.chkBox_fastShipFlying.Enabled = this.chkBox_hyperHints.Enabled = this.chkBox_randomDoorColors.Enabled = this.chkBox_randomWeldingColors.Enabled = this.chkBox_requireLauncher.Enabled = this.chkBox_requireShipMissile.Enabled = this.chkBox_skipPhaaze.Enabled = !generating;
                 // Switch all combo boxes to ON/OFF
                 this.comboBox_startingItems.Enabled = this.comboBox_startingLocation.Enabled = !generating;
             }
@@ -408,8 +408,11 @@ namespace MP3Randomizer_GUI
                         { "starting-location", GetControlText(this.comboBox_startingLocation) },
                         { "random-door-colors", IsCheckBoxChecked(this.chkBox_randomDoorColors) ? "true":"false" },
                         { "random-welding-colors", IsCheckBoxChecked(this.chkBox_randomWeldingColors) ? "true":"false" },
-                        { "fast-flying",IsCheckBoxChecked(this.chkBox_fastShipFlying) ? "true":"false" },
-                        { "hyper-hints", IsCheckBoxChecked(this.chkBox_hyperHints) ? "true":"false" }
+                        { "fast-flying", IsCheckBoxChecked(this.chkBox_fastShipFlying) ? "true":"false" },
+                        { "hyper-hints", IsCheckBoxChecked(this.chkBox_hyperHints) ? "true":"false" },
+                        { "require-launcher", IsCheckBoxChecked(this.chkBox_requireLauncher) ? "true":"false" },
+                        { "require-ship-missile", IsCheckBoxChecked(this.chkBox_requireShipMissile) ? "true":"false" },
+                        { "phaaze-skip", IsCheckBoxChecked(this.chkBox_skipPhaaze) ? "true":"false" }
                     });
 
                     SetStatus("Applying dol patches...");
