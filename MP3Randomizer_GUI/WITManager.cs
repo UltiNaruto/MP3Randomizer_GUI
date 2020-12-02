@@ -63,7 +63,7 @@ namespace MP3Randomizer_GUI
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = WIT_PATH,
-                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" --id \"" + GameCode + "\" --auto-split --overwrite",
+                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" --id \"" + GameCode + "\" -v --auto-split --overwrite",
                         WorkingDirectory = Directory.GetCurrentDirectory(),
                         CreateNoWindow = true,
                         UseShellExecute = false,
@@ -102,7 +102,7 @@ namespace MP3Randomizer_GUI
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = WIT_PATH,
-                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" -C --id \"" + GameCode + "\" -z --trunc --auto-split --overwrite",
+                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" -C --id \"" + GameCode + "\" -v -z --trunc --auto-split --overwrite",
                         WorkingDirectory = Directory.GetCurrentDirectory(),
                         CreateNoWindow = true,
                         UseShellExecute = false,
@@ -141,7 +141,7 @@ namespace MP3Randomizer_GUI
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = WIT_PATH,
-                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" -B --id \"" + GameCode + "\" -z --trunc --auto-split --overwrite",
+                        Arguments = "COPY .\\tmp\\wii -d \"" + filename + "\" -B --id \"" + GameCode + "\" -v -z --trunc --auto-split --overwrite",
                         WorkingDirectory = Directory.GetCurrentDirectory(),
                         CreateNoWindow = true,
                         UseShellExecute = false,
@@ -174,11 +174,12 @@ namespace MP3Randomizer_GUI
                     Directory.Delete(@".\bak", true);
                 if (Directory.Exists(@".\tmp\wii"))
                     Directory.Delete(@".\tmp\wii", true);
+                Directory.CreateDirectory(@".\tmp\wii");
                 using (var proc = new Process {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = WIT_PATH,
-                        Arguments = "EXTRACT \"" + filename + "\" -d .\\tmp\\wii",
+                        Arguments = "EXTRACT \"" + filename + "\" -D .\\tmp\\wii -v -o",
                         WorkingDirectory = Directory.GetCurrentDirectory(),
                         CreateNoWindow = true,
                         UseShellExecute = false,

@@ -450,6 +450,11 @@ namespace MP3Randomizer_GUI
                     switchMode(false);
 
                     MessageBox.Show("Corruption ISO has been randomized! Have fun!");
+                } catch (ThreadAbortException tae) {
+                    // don't show message
+                    SetStatus("Idle");
+                    SetProgressStatus(preGenerationStepCount + 3, preGenerationStepCount + generateStepCount);
+                    switchMode(false);
                 } catch (Exception ex) {
                     MessageBox.Show("An error occured while generating the randomized game!\r\nCheck err.log for more details!");
                     LogManager.Log("err.log", ex.Message + "\r\n" + ex.StackTrace);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace MP3Randomizer_GUI
 {
@@ -21,6 +22,8 @@ namespace MP3Randomizer_GUI
                             args += " ";
                         if (setting.Value == "true")
                             args += "--" + setting.Key;
+                        else if(Regex.IsMatch(setting.Value, @"[a-zA-Z|\.]:[\\\/](?:[a-zA-Z0-9]+[\\\/])*"))
+                            args += "--" + setting.Key + " \"" + setting.Value + "\"";
                         else
                             args += "--" + setting.Key + " " + setting.Value;
                     }

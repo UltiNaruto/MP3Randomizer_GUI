@@ -53,14 +53,14 @@
             this.comboBox_startingLocation = new DarkUI.Controls.DarkComboBox();
             this.chkBox_randomDoorColors = new DarkUI.Controls.DarkCheckBox();
             this.chkBox_fastShipFlying = new DarkUI.Controls.DarkCheckBox();
+            this.chkBox_skipPhaaze = new DarkUI.Controls.DarkCheckBox();
+            this.chkBox_requireLauncher = new DarkUI.Controls.DarkCheckBox();
+            this.chkBox_requireShipMissile = new DarkUI.Controls.DarkCheckBox();
             this.btn_generate = new DarkUI.Controls.DarkButton();
             this.darkStatusStrip1 = new DarkUI.Controls.DarkStatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.btn_exit = new DarkUI.Controls.DarkButton();
-            this.chkBox_skipPhaaze = new DarkUI.Controls.DarkCheckBox();
-            this.chkBox_requireLauncher = new DarkUI.Controls.DarkCheckBox();
-            this.chkBox_requireShipMissile = new DarkUI.Controls.DarkCheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -76,7 +76,7 @@
             this.lbl_appTitle.Name = "lbl_appTitle";
             this.lbl_appTitle.Size = new System.Drawing.Size(330, 29);
             this.lbl_appTitle.TabIndex = 0;
-            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.6";
+            this.lbl_appTitle.Text = "MP3 Randomizer GUI v1.0.7";
             // 
             // tableLayoutPanel1
             // 
@@ -417,6 +417,39 @@
             this.chkBox_fastShipFlying.TabIndex = 18;
             this.chkBox_fastShipFlying.Text = "Fast ship flying";
             // 
+            // chkBox_skipPhaaze
+            // 
+            this.chkBox_skipPhaaze.AutoSize = true;
+            this.chkBox_skipPhaaze.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkBox_skipPhaaze.Location = new System.Drawing.Point(10, 143);
+            this.chkBox_skipPhaaze.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
+            this.chkBox_skipPhaaze.Name = "chkBox_skipPhaaze";
+            this.chkBox_skipPhaaze.Size = new System.Drawing.Size(134, 23);
+            this.chkBox_skipPhaaze.TabIndex = 19;
+            this.chkBox_skipPhaaze.Text = "Skip Phaaze";
+            // 
+            // chkBox_requireLauncher
+            // 
+            this.chkBox_requireLauncher.AutoSize = true;
+            this.chkBox_requireLauncher.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkBox_requireLauncher.Location = new System.Drawing.Point(10, 115);
+            this.chkBox_requireLauncher.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
+            this.chkBox_requireLauncher.Name = "chkBox_requireLauncher";
+            this.chkBox_requireLauncher.Size = new System.Drawing.Size(179, 22);
+            this.chkBox_requireLauncher.TabIndex = 20;
+            this.chkBox_requireLauncher.Text = "Require Launcher";
+            // 
+            // chkBox_requireShipMissile
+            // 
+            this.chkBox_requireShipMissile.AutoSize = true;
+            this.chkBox_requireShipMissile.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkBox_requireShipMissile.Location = new System.Drawing.Point(372, 115);
+            this.chkBox_requireShipMissile.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
+            this.chkBox_requireShipMissile.Name = "chkBox_requireShipMissile";
+            this.chkBox_requireShipMissile.Size = new System.Drawing.Size(202, 22);
+            this.chkBox_requireShipMissile.TabIndex = 21;
+            this.chkBox_requireShipMissile.Text = "Require Ship Missile";
+            // 
             // btn_generate
             // 
             this.btn_generate.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -468,39 +501,6 @@
             this.btn_exit.TabIndex = 4;
             this.btn_exit.Text = "X";
             this.btn_exit.Click += new System.EventHandler(this.btn_exit_Click);
-            // 
-            // chkBox_skipPhaaze
-            // 
-            this.chkBox_skipPhaaze.AutoSize = true;
-            this.chkBox_skipPhaaze.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkBox_skipPhaaze.Location = new System.Drawing.Point(10, 143);
-            this.chkBox_skipPhaaze.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
-            this.chkBox_skipPhaaze.Name = "chkBox_skipPhaaze";
-            this.chkBox_skipPhaaze.Size = new System.Drawing.Size(134, 23);
-            this.chkBox_skipPhaaze.TabIndex = 19;
-            this.chkBox_skipPhaaze.Text = "Skip Phaaze";
-            // 
-            // chkBox_requireLauncher
-            // 
-            this.chkBox_requireLauncher.AutoSize = true;
-            this.chkBox_requireLauncher.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkBox_requireLauncher.Location = new System.Drawing.Point(10, 115);
-            this.chkBox_requireLauncher.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
-            this.chkBox_requireLauncher.Name = "chkBox_requireLauncher";
-            this.chkBox_requireLauncher.Size = new System.Drawing.Size(179, 22);
-            this.chkBox_requireLauncher.TabIndex = 20;
-            this.chkBox_requireLauncher.Text = "Require Launcher";
-            // 
-            // chkBox_requireShipMissile
-            // 
-            this.chkBox_requireShipMissile.AutoSize = true;
-            this.chkBox_requireShipMissile.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkBox_requireShipMissile.Location = new System.Drawing.Point(372, 115);
-            this.chkBox_requireShipMissile.Margin = new System.Windows.Forms.Padding(10, 3, 10, 3);
-            this.chkBox_requireShipMissile.Name = "chkBox_requireShipMissile";
-            this.chkBox_requireShipMissile.Size = new System.Drawing.Size(202, 22);
-            this.chkBox_requireShipMissile.TabIndex = 21;
-            this.chkBox_requireShipMissile.Text = "Require Ship Missile";
             // 
             // Form1
             // 
